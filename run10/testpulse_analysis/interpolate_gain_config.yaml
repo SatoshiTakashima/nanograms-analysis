@@ -1,0 +1,14 @@
+input:
+  testpulse_csv: products/testpulse_gain/run10_testpulse_data.csv
+
+  # Example gamma run list. It should have a column named "time" by default.
+  # "time" may be either "20251001/0233_05" or just "0233_05".
+  gamma_csv: ../subproducts/run10data.csv
+  gamma_time_column: time
+
+  # Required only when gamma_time_column values do not include the date.
+  default_date: "20251001"
+  fec_ids: [0, 1, 2, 3]
+
+output:
+  csv: products/testpulse_gain/run10data_with_interpolated_FEC.csv

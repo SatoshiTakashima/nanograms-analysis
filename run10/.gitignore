@@ -1,0 +1,4 @@
+products
+subproducts/*.hdf5
+subproducts/*.root
+testpulse_analysis/products
