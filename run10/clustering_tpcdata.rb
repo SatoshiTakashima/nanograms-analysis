@@ -6,7 +6,8 @@ require 'csv'
 
 class MyAppDataReduction < ANL::ANLApp
   attr_accessor :tpc_tree_file, :hittree_file
-  attr_accessor :rawhitdata_file, :quicklook_file
+  attr_accessor :rawhittree_file
+  attr_accessor :quicklook_file
   attr_accessor :gain_tp_file, :gain_tp_hash
 
   def setup
@@ -16,7 +17,7 @@ class MyAppDataReduction < ANL::ANLApp
     with_parameters(
       config_file:     "config_pipeline.yaml",
       tpctree_file:    @tpc_tree_file,
-      rawhitdata_file: @rawhitdata_file,
+      rawhittree_file: @rawhittree_file,
       quicklook_file:  @quicklook_file,
     )
 
@@ -25,29 +26,6 @@ class MyAppDataReduction < ANL::ANLApp
     calibration_parameters[:gain_tp_hash] = @gain_tp_hash if @gain_tp_hash
     calibration_parameters[:gain_tp_file] = @gain_tp_file if @gain_tp_file
     with_parameters(**calibration_parameters)
-  end
-end
-
-class MyAppReconstruction < ANL::ANLApp
-  attr_accessor :inputs, :output
-
-  def setup()
-    add_namespace ComptonSoft
-
-    chain :CSHitCollection
-    chain :ConstructDetector
-    with_parameters(detector_configuration: "database/detector_configuration.xml",
-                    verbose_level: 1)
-    chain :ReadHitTree
-    with_parameters(file_list: @inputs)
-    chain :EventReconstruction
-    with_parameters(reconstruction_method: "NanoGRAMS",
-                    source_distant: false,
-                    source_position: vec(50.0, 0.0, 0.0),
-                    parameter_file: "parfile_NanoGRAMS.yaml")
-    chain :WriteComptonEventTree
-    chain :SaveData
-    with_parameters(output: @output)
   end
 end
 
@@ -74,12 +52,12 @@ end
 
 ### main ###
 filename      = "metadata/run10data_with_interpolated_FEC_HSTD14.csv"
+#filename      = "metadata/run10data_with_interpolated_FEC.csv"
 data_root_dir = "/Users/takashima/work/grams/run/run10/data/tpc/data"
 gain_tp_file  = "testpulse_analysis/products/run10_testpulse_data.csv"
 outdir_parent = "products"
 hittree_files = []
 compton_files = []
-
 CSV.foreach(filename, headers: true) do |row|
   time_array = row["time"].split("/")
 
@@ -89,23 +67,16 @@ CSV.foreach(filename, headers: true) do |row|
  
  ### Data reduction
  a = MyAppDataReduction.new
+ a.console = false
  a.tpc_tree_file   = "#{data_dir}/tpc_data.root"
- a.rawhitdata_file = "#{outdir}/rawhittree.root"
+ a.rawhittree_file = "#{outdir}/rawhittree.root"
  a.quicklook_file  = "#{outdir}/quicklook_tree.root"
  a.gain_tp_file    = gain_tp_file
  a.hittree_file    = "#{outdir}/hittree.root"
 
- a.run(:all, 1000)
+
+ a.run(:all)
  hittree_files << a.hittree_file
- 
- ### Event reconstruction
- b = MyAppReconstruction.new
- b.inputs = ["#{outdir}/hittree.root"]
- b.output = "#{outdir}/compton.root"
- 
- b.run(:all, 1000)
- compton_files << b.output
 end
 
 merge_root_files("#{outdir_parent}/hittree_merged.root", hittree_files)
-merge_root_files("#{outdir_parent}/compton_merged.root", compton_files)
