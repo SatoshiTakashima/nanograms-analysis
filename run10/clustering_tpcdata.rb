@@ -29,30 +29,12 @@ class MyAppDataReduction < ANL::ANLApp
   end
 end
 
-def merge_root_files(output_file, input_files)
-  existing_files = input_files.select { |path| File.file?(path) }
-  missing_files = input_files - existing_files
-
-  missing_files.each do |path|
-    warn("[merge] skip missing file: #{path}")
-  end
-
-  if existing_files.empty?
-    warn("[merge] no input files for #{output_file}")
-    return
-  end
-
-  FileUtils.mkdir_p(File.dirname(output_file))
-  puts("[merge] #{output_file}")
-  unless system("hadd", "-f", output_file, *existing_files)
-    raise "hadd failed: #{output_file}"
-  end
-end
-
 
 ### main ###
-filename      = "metadata/run10data_with_interpolated_FEC_HSTD14.csv"
-#filename      = "metadata/run10data_with_interpolated_FEC.csv"
+#data_type     = "HSTD14"
+#data_type     = "zm4cm"
+data_type     = "z4cm"
+filename      = "metadata/data_group_#{data_type}.csv"
 data_root_dir = "/Users/takashima/work/grams/run/run10/data/tpc/data"
 gain_tp_file  = "testpulse_analysis/products/run10_testpulse_data.csv"
 outdir_parent = "products"
@@ -78,5 +60,3 @@ CSV.foreach(filename, headers: true) do |row|
  a.run(:all)
  hittree_files << a.hittree_file
 end
-
-merge_root_files("#{outdir_parent}/hittree_merged.root", hittree_files)
