@@ -56,7 +56,7 @@ quality:
 output:
   outdir: products
   fits_csv: testpulse_fits.csv
-  summary_csv: run10_testpulse_data.csv
+  summary_csv: testpulse_data.csv
   plot_dir: plots
   make_plots: true
 

@@ -14,7 +14,7 @@ class MyAppDataReduction < ANL::ANLApp
 
     chain :NanoGRAMSHitExtraction
     with_parameters(
-      config_file:     "config_pipeline.yaml",
+      config_file:     "metadata/config_pipeline.yaml",
       tpctree_file:    @tpc_tree_file,
       quicklook_file:  @quicklook_file,
     )
@@ -30,13 +30,13 @@ end
 
 ### main ###
 data_root_dir = "/Users/takashima/work/grams/run/run10/data/tpc/data"
-gain_tp_file  = "testpulse_analysis/products/run10_testpulse_data.csv"
 outdir_parent = "products"
 
 data_group_list = ["z0cm", "z4cm", "zm4cm"]
 
 data_group_list.each do |tag|
-  filename      = "metadata/data_group_#{tag}.csv"
+  gain_tp_file  = "../metadata/products/interpolated_gain_#{tag}.csv"
+  filename      = "metadata/data_group/data_group_#{tag}.csv"
   hittree_files = []
   compton_files = []
   CSV.foreach(filename, headers: true) do |row|
@@ -49,10 +49,10 @@ data_group_list.each do |tag|
    ### Data reduction
    a = MyAppDataReduction.new
    a.console = false
-   a.tpc_tree_file   = "#{data_dir}/tpc_data.root"
-   a.quicklook_file  = "#{outdir}/quicklook_tree.root"
-   a.gain_tp_file    = gain_tp_file
-   a.hittree_file    = "#{outdir}/hittree.root"
+   a.tpc_tree_file  = "#{data_dir}/tpc_data.root"
+   a.quicklook_file = "#{outdir}/quicklook_tree.root"
+   a.gain_tp_file   = gain_tp_file
+   a.hittree_file   = "#{outdir}/hittree.root"
   
    a.run(:all)
    hittree_files << a.hittree_file

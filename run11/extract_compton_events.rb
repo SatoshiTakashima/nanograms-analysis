@@ -36,7 +36,7 @@ outdir_parent = "products"
 data_group_list = ["Na22"]
 
 data_group_list.each do |tag|
-  filename      = "metadata/data_group_#{tag}.csv"
+  filename      = "metadata/data_group/data_group_#{tag}.csv"
   outdir        = "#{outdir_parent}/#{tag}"
   hittree_files = []
   

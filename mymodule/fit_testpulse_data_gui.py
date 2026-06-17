@@ -27,7 +27,8 @@ from pathlib import Path
 import numpy as np
 
 import sys
-sys.path.append("../../mymodule")
+
+#sys.path.append("../../mymodule")
 import analyze_testpulse_gain as tp
 
 
@@ -907,29 +908,17 @@ class TestPulseReviewGUI:
         self.plt.show()
 
 
-    #def main() -> None:
-    #args = parse_args()
-    #cfg = tp.load_config(args.config)
-    #cfg.outdir.mkdir(parents=True, exist_ok=True)
-    #mpl_cache_dir = cfg.outdir / ".matplotlib"
-    #mpl_cache_dir.mkdir(parents=True, exist_ok=True)
-    #os.environ.setdefault("MPLCONFIGDIR", str(mpl_cache_dir))
-
-    #app = TestPulseReviewGUI(cfg, args.start)
-    #app.show()
-
-
-if __name__ == "__main__":
-    #main()
-    config_file_path = "../metadata/config_testpulse_fit.yaml"
-    cfg = tp.load_config(config_file_path)
-
-    cfg.outdir.mkdir(parents=True, exist_ok=True)
-
-    mpl_cache_dir = cfg.outdir / ".matplotlib"
-    mpl_cache_dir.mkdir(parents=True, exist_ok=True)
-    os.environ.setdefault("MPLCONFIGDIR", str(mpl_cache_dir))
-
-    #app = TestPulseReviewGUI(cfg, args.start)
-    app = TestPulseReviewGUI(cfg)
-    app.show()
+    #if __name__ == "__main__":
+    #    #main()
+    #    config_file_path = "../metadata/config_testpulse_fit.yaml"
+    #    cfg = tp.load_config(config_file_path)
+    #
+    #    cfg.outdir.mkdir(parents=True, exist_ok=True)
+    #
+    #    mpl_cache_dir = cfg.outdir / ".matplotlib"
+    #    mpl_cache_dir.mkdir(parents=True, exist_ok=True)
+    #    os.environ.setdefault("MPLCONFIGDIR", str(mpl_cache_dir))
+    #
+    #    #app = TestPulseReviewGUI(cfg, args.start)
+    #    app = TestPulseReviewGUI(cfg)
+    #    app.show()

@@ -36,7 +36,7 @@ outdir_parent = "products"
 data_group_list = ["Na22"]
 
 data_group_list.each do |tag|
-  filename      = "metadata/data_group_#{tag}.csv"
+  filename      = "metadata/data_group/data_group_#{tag}.csv"
   hittree_files = []
   compton_files = []
   CSV.foreach(filename, headers: true) do |row|
@@ -49,10 +49,10 @@ data_group_list.each do |tag|
    ### Data reduction
    a = MyAppDataReduction.new
    a.console = false
-   a.tpc_tree_file   = "#{data_dir}/tpc_data.root"
-   a.quicklook_file  = "#{outdir}/quicklook_tree.root"
-   a.gain_tp_file    = gain_tp_file
-   a.hittree_file    = "#{outdir}/hittree.root"
+   a.tpc_tree_file  = "#{data_dir}/tpc_data.root"
+   a.quicklook_file = "#{outdir}/quicklook_tree.root"
+   a.gain_tp_file   = gain_tp_file
+   a.hittree_file   = "#{outdir}/hittree.root"
   
    a.run(:all)
    hittree_files << a.hittree_file
