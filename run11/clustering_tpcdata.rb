@@ -14,7 +14,7 @@ class MyAppDataReduction < ANL::ANLApp
 
     chain :NanoGRAMSHitExtraction
     with_parameters(
-      config_file:     "config_pipeline.yaml",
+      config_file:     "metadata/config_pipeline.yaml",
       tpctree_file:    @tpc_tree_file,
       quicklook_file:  @quicklook_file,
     )
@@ -29,11 +29,11 @@ end
 
 
 ### main ###
-data_root_dir = "/Users/takashima/work/grams/run/run10/data/tpc/data"
-gain_tp_file  = "testpulse_analysis/products/run10_testpulse_data.csv"
+data_root_dir = "/Users/takashima/work/grams/run/run11/tpc/data"
+gain_tp_file  = "../metadata/products/interpolated_gain_Na22.csv"
 outdir_parent = "products"
 
-data_group_list = ["z0cm", "z4cm", "zm4cm"]
+data_group_list = ["Na22"]
 
 data_group_list.each do |tag|
   filename      = "metadata/data_group_#{tag}.csv"

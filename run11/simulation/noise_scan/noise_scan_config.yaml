@@ -1,0 +1,53 @@
+simulation:
+  execute: false
+  ruby_command: ruby
+  num_events: 100000
+  random_seed: 0
+
+  detector_configuration: ../../database/detector_configuration.xml
+  detector_parameters_template: ../../database/detector_parameters.xml
+  gdml: ../../database/mass_model.gdml
+
+  # Output file written by ComptonSoft::Simulation inside each run directory.
+  output_root: simulation.root
+
+  # ROOT file to compare after simulation/postprocess. If the simulation output
+  # already contains a hittree, keep this the same as output_root.
+  hittree_root: simulation.root
+
+  # Optional conversion step. Available placeholders:
+  #   {run_dir}, {sim_root}, {sim_hittree}
+  # Example:
+  # postprocess_command: "ruby ../../convert_sim_to_hittree.rb {sim_root} {sim_hittree}"
+  postprocess_command: null
+
+scan:
+  min: 0.020
+  max: 0.080
+  steps: 7
+  # values: [0.020, 0.030, 0.036, 0.045, 0.060]
+
+data:
+  hittree: ../../products/20251001/0233_05/hittree.root
+  tree: hittree
+
+branches:
+  energy: energy
+  event: eventid
+
+spectrum:
+  mode: event-sum
+  one_hit_only: true
+
+histogram:
+  min_kev: 0.0
+  max_kev: 2000.0
+  bin_width_kev: 5.0
+
+comparison:
+  normalize_min_kev: 350.0
+  min_kev: 350.0
+  max_kev: 1300.0
+
+output:
+  outdir: products/noise_param1_scan

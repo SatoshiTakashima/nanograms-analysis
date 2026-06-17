@@ -20,10 +20,10 @@ class MyApp < ANL::ANLApp
                     y_min: -15.0,
                     y_max: +15.0,
                     plane_normal: vec(1.0, 0.0, 0.0),
-                    plane_point: vec(50.0, 0.0, 0.0),
+                    plane_point: vec(42.75, 0.0, 0.0),
                     plane_yaxis:  vec(0.0, 0.0, 1.0),
-                    num_pixel_x: 100,
-                    num_pixel_y: 100,
+                    num_pixel_x: 200,
+                    num_pixel_y: 200,
                     arm: 3.0,
                     num_points: 10000)
     chain :SaveData
@@ -31,11 +31,7 @@ class MyApp < ANL::ANLApp
   end
 end
 
-data_group_list = ["z0cm", "z4cm", "zm4cm"]
-
-data_group_list.each do |tag|
-  app = MyApp.new
-  app.inputs = ["products/#{tag}/compton.root"]
-  app.output = "products/#{tag}/compton_image.root"
-  app.run(:all)
-end
+app = MyApp.new
+app.inputs = ["products/Na22/compton.root"]
+app.output = "products/Na22/compton_image.root"
+app.run(:all)

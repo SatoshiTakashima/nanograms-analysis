@@ -21,7 +21,7 @@ class MyApp < ANL::ANLApp
     with_parameters(reconstruction_method: "NanoGRAMS",
                     source_distant: false,
                     source_position: @source_position,
-                    parameter_file: "parfile_NanoGRAMS.yaml")
+                    parameter_file: "metadata/parfile_NanoGRAMS.yaml")
     chain :WriteComptonEventTree
     chain :SaveData
     with_parameters(output: @output)
@@ -30,10 +30,10 @@ end
 
 
 ### main ###
-source_position = vec(50.0, 0.0, -4.0)
+source_position = vec(42.75, 0.0, 0.0)
 outdir_parent = "products"
 
-data_group_list = ["z0cm", "z4cm", "zm4cm"]
+data_group_list = ["Na22"]
 
 data_group_list.each do |tag|
   filename      = "metadata/data_group_#{tag}.csv"
