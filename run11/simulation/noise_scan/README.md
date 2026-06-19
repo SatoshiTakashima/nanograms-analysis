@@ -7,8 +7,8 @@ This directory scans `database/detector_parameters.xml`:
 ```
 
 For each configured `param1`, `run_noise_param_scan.py` creates an isolated run
-directory, writes a modified detector-parameter XML, generates a Ruby simulation
-runner, and optionally executes it.
+directory, writes a modified detector-parameter XML, and optionally executes the
+configured Ruby simulation runner with that XML as an argument.
 
 ## Dry run / prepare files
 
@@ -20,7 +20,6 @@ With `simulation.execute: false`, this prepares:
 
 ```text
 products/noise_param1_scan/runs/param1_*/detector_parameters.xml
-products/noise_param1_scan/runs/param1_*/run_simulation.rb
 ```
 
 If matching hittree ROOT files already exist in those run directories, the script

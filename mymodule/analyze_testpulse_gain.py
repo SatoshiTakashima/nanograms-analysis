@@ -191,6 +191,14 @@ def gaussian_with_const(x, amplitude, mean, sigma, baseline):
     return amplitude * np.exp(-0.5 * ((x - mean) / sigma) ** 2.0) + baseline
 
 
+def integer_centered_histogram_edges(cfg: FitConfig) -> np.ndarray:
+    """Return bin edges whose centers sit on integer-like ADU values."""
+    half_width = 0.5 * cfg.histogram_bin_width_adu
+    return np.arange(cfg.histogram_min_adu - half_width,
+                     cfg.histogram_max_adu + half_width + cfg.histogram_bin_width_adu,
+                     cfg.histogram_bin_width_adu)
+
+
 def fit_histogram_with_iminuit_mle(values: np.ndarray,
                                    cfg: FitConfig,
                                    peak_guess: float,
@@ -359,9 +367,7 @@ def fit_fec(time_id: str,
         result.reason = "too_few_events"
         return result
 
-    edges = np.arange(cfg.histogram_min_adu,
-                      cfg.histogram_max_adu + cfg.histogram_bin_width_adu,
-                      cfg.histogram_bin_width_adu)
+    edges = integer_centered_histogram_edges(cfg)
     counts, edges = np.histogram(values, bins=edges)
     centers = 0.5 * (edges[:-1] + edges[1:])
     result.hist_counts = counts

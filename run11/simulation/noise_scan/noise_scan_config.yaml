@@ -1,14 +1,14 @@
 simulation:
   execute: false
   ruby_command: ruby
+  runner: ../run_simulation.rb
   num_events: 100000
   random_seed: 0
+  energy_kev: 1332.5
 
-  detector_configuration: ../../database/detector_configuration.xml
   detector_parameters_template: ../../database/detector_parameters.xml
-  gdml: ../../database/mass_model.gdml
 
-  # Output file written by ComptonSoft::Simulation inside each run directory.
+  # Output file written by run_simulation.rb inside each run directory.
   output_root: simulation.root
 
   # ROOT file to compare after simulation/postprocess. If the simulation output

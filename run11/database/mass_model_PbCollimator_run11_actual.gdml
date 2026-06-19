@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define>
+    <quantity name="gasPhaseHeight" type="length" value="450.0" unit="mm" />
+    <quantity name="liquidPhaseHeight" type="length" value="780.0-gasPhaseHeight/mm" unit="mm" />
+    <quantity name="chamberThicknessIn" type="length" value="3.0" unit="mm" />
+    <quantity name="chamberThicknessOut" type="length" value="4.0" unit="mm" />
+    <quantity name="PbBlockSizeX" value="100.0" unit="mm" type="length" />
+    <quantity name="PbBlockSizeY" value="150.0" unit="mm" type="length" />
+    <quantity name="PbBlockSizeZ" value="50.0" unit="mm" type="length" />
+    <quantity name="PbRocketHoleSize" value="22.5" unit="mm" type="length" />
+    <quantity name="PbRocketRadius" value="42.5" unit="mm" type="length" />
+    <quantity name="PbTubeLength" value="50.0" unit="mm" type="length" />
+    <quantity name="SlitSize" value="4" unit="mm" type="length" />
+    <quantity name="CenterOfChamberToTPCCenter" value="145" unit="mm" />
+    <quantity name="SourceDistance_x" value="320+100+CenterOfChamberToTPCCenter/mm" unit="mm" type="length" /><!-- This should be also set to the x coordinate of the source position-->
+    <position name="LAr.inner.sub.pos" unit="mm" x="0" y="0" z="0" />
+    <position name="LAr.inner.pos" unit="mm" x="0" y="0" z="0" />
+    <position name="PTFE.wall.pos" unit="mm" x="145.0" y="0" z="265.0-liquidPhaseHeight/mm/2" />
+    <position name="LArTPC0.center" unit="mm" x="-12.8" y="-12.8" z="0" />
+    <position name="LArTPC1.center" unit="mm" x=" 12.8" y="-12.8" z="0" />
+    <position name="LArTPC2.center" unit="mm" x=" 12.8" y=" 12.8" z="0" />
+    <position name="LArTPC3.center" unit="mm" x="-12.8" y=" 12.8" z="0" />
+  </define>
+  <materials>
+    <element Z="6" formula="C" name="carbon">
+      <atom value="12.0107" />
+    </element>
+    <element Z="24" formula="Cr" name="chromium">
+      <atom value="51.9961" />
+    </element>
+    <element Z="26" formula="Fe" name="iron">
+      <atom value="55.8450" />
+    </element>
+    <element Z="28" formula="Ni" name="nickel">
+      <atom value="58.6934" />
+    </element>
+    <element Z="9" formula="F" name="fluorine">
+      <atom value="18.998403" />
+    </element>
+    <material Z="1" name="Vacuum" state="gas">
+      <D unit="g/cm3" value="1e-12" />
+      <atom unit="g/mole" value="1" />
+    </material>
+    <material Z="18" name="LAr" state="liquid">
+      <D unit="g/cm3" value="1.3954" />
+      <atom unit="g/mole" value="39.948" />
+    </material>
+    <material Z="13" name="Al" state="solid">
+      <D unit="g/cm3" value="2.70" />
+      <atom value="26.9815386" unit="g/mole" />
+    </material>
+    <material Z="18" name="GAr" state="gas">
+      <D unit="g/cm3" value="0.001784" />
+      <atom unit="g/mole" value="39.948" />
+    </material>
+    <material formula="STEEL_STAINLESS_Fe7Cr2Ni" name="STEEL_STAINLESS_Fe7Cr2Ni">
+      <D unit="g/cm3" value="7.9300" />
+      <fraction n="0.0010" ref="carbon" />
+      <fraction n="0.1792" ref="chromium" />
+      <fraction n="0.7298" ref="iron" />
+      <fraction n="0.0900" ref="nickel" />
+    </material>
+    <material name="Pb" Z="82" state="solid">
+      <D unit="g/cm3" value="11.34" />
+      <atom unit="g/mole" value="207.2" />
+    </material>
+
+    <material name="PTFE">
+      <D unit="g/cm3" value="2.2" />
+      <composite n="2" ref="carbon" />
+      <composite n="4" ref="fluorine" />
+    </material>
+  </materials>
+
+  <solids>
+    <box lunit="mm" name="World.box" x="5000.0" y="5000.0" z="5000.0" />
+    <box x="400.0" y="400.0" z="3000.0" name="Collimator.box" lunit="mm" />
+    <box lunit="mm" name="LArTPC.box" x="25.6" y="25.6" z="100.0" />
+    <eltube lunit="mm" name="GAr.tube" dx="250.0" dy="250.0" dz="gasPhaseHeight/2" />
+    <eltube lunit="mm" name="LAr.tube" dx="250.0" dy="250.0" dz="liquidPhaseHeight/2" />
+    <eltube lunit="mm" name="chamber_in_R.tube" dx="253.0" dy="253.0" dz="390.0" />
+    <eltube lunit="mm" name="chamber_out_r.tube" dx="290.0" dy="290.0" dz="390.0" />
+    <eltube lunit="mm" name="chamber_out_R.tube" dx="294.0" dy="294.0" dz="390.0" />
+    <eltube lunit="mm" name="Pb.tube" dx="50.0" dy="50.0" dz="100.0" />
+    <tube lunit="mm" name="PbRocket.tube" rmin="0.0" rmax="PbRocketRadius" z="PbTubeLength"
+      deltaphi="360"
+      startphi="0.0" aunit="degree" />
+    <tube rmax="22.5" deltaphi="360" z="48.0" startphi="0.0" aunit="degree" lunit="mm"
+      name="PbRocketInner.tube" />
+    <tube rmax="PbRocketHoleSize" deltaphi="360" z="10000.0" startphi="0.0" aunit="degree"
+      lunit="mm"
+      name="PbRocketHole.tube" />
+    <subtraction name="PbRocket1.sub">
+      <first ref="PbRocket.tube" />
+      <second ref="PbRocketInner.tube" />
+      <position name="PbRocketInner.pos" unit="mm" x="0.0" y="0.0" z="-10.0" />
+    </subtraction>
+    <subtraction name="PbRocket2.sub">
+      <first ref="PbRocket1.sub" />
+      <second ref="PbRocketHole.tube" />
+      <position name="PbRocketHole.pos" unit="mm" x="0.0" y="0.0" z="15.0" />
+    </subtraction>
+    <box x="PbBlockSizeX" y="PbBlockSizeY" z="PbBlockSizeZ" name="PbBlock.box" lunit="mm" />
+
+    <!-- ★ 新追加：PTFE + LAr(inner) 構造 -->
+    <box name="PTFE.outer" lunit="mm" x="115" y="115" z="100" />
+    <box name="LAr.inner" lunit="mm" x="51.2" y="51.2" z="100" />
+
+    <!--<subtraction name="PTFE.wall">
+      <first ref="PTFE.outer" />
+      <second ref="LAr.inner" />
+      <positionref ref="LAr.inner.sub.pos" />
+    </subtraction>-->
+  </solids>
+
+  <structure>
+    <volume name="LArTPC.log">
+      <materialref ref="LAr" />
+      <solidref ref="LArTPC.box" />
+    </volume>
+
+    <volume name="PassiveGAr.log">
+      <materialref ref="GAr" />
+      <solidref ref="GAr.tube" />
+    </volume>
+
+    <!-- ★ 内側のアクティブ LAr（51.2×51.2×100） -->
+    <volume name="LAr.inner.log">
+      <materialref ref="LAr" />
+      <solidref ref="LAr.inner" />
+
+      <physvol name="LArTPC0">
+        <volumeref ref="LArTPC.log" />
+        <positionref ref="LArTPC0.center" />
+      </physvol>
+      <physvol name="LArTPC1">
+        <volumeref ref="LArTPC.log" />
+        <positionref ref="LArTPC1.center" />
+      </physvol>
+      <physvol name="LArTPC2">
+        <volumeref ref="LArTPC.log" />
+        <positionref ref="LArTPC2.center" />
+      </physvol>
+      <physvol name="LArTPC3">
+        <volumeref ref="LArTPC.log" />
+        <positionref ref="LArTPC3.center" />
+      </physvol>
+    </volume>
+    <!-- ★ PTFE 壁（外側115mm） -->
+    <volume name="PTFE.wall.log">
+      <materialref ref="PTFE" />
+      <solidref ref="PTFE.outer" />
+
+      <physvol name="LAr.inner.vol">
+        <volumeref ref="LAr.inner.log" />
+        <positionref ref="LAr.inner.pos" />
+      </physvol>
+    </volume>
+
+    <!-- Passive LAr（円筒） -->
+    <volume name="PassiveLAr.log">
+      <materialref ref="LAr" />
+      <solidref ref="LAr.tube" />
+
+      <!-- ★ この中に PTFE の箱を追加 -->
+      <physvol name="PTFE.wall.vol">
+        <volumeref ref="PTFE.wall.log" />
+        <positionref ref="PTFE.wall.pos" />
+      </physvol>
+    </volume>
+
+    <volume name="PassiveChamber_in.log">
+      <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni" />
+      <solidref ref="chamber_in_R.tube" />
+      <physvol name="PassiveLAr">
+        <volumeref ref="PassiveLAr.log" />
+        <position name="PassiveLAr.pos" unit="mm" x="0.0" y="0.0" z="-gasPhaseHeight/2" />
+      </physvol>
+      <physvol name="PassiveGAr">
+        <volumeref ref="PassiveGAr.log" />
+        <position name="PassiveGAr.pos" unit="mm" x="0.0" y="0.0" z="390.0-gasPhaseHeight/2" />
+      </physvol>
+    </volume>
+
+    <volume name="ChamberVacuum.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="chamber_out_r.tube" />
+      <physvol name="PassiveChamber_in">
+        <volumeref ref="PassiveChamber_in.log" />
+        <position name="PassiveChamber_in.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+    </volume>
+
+    <volume name="PassiveChamber_out.log">
+      <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni" />
+      <solidref ref="chamber_out_R.tube" />
+      <physvol name="ChamberVacuum">
+        <volumeref ref="ChamberVacuum.log" />
+        <position name="ChamberVacuum.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+    </volume>
+
+    <volume name="CollimatorPbRocket.log">
+      <materialref ref="Pb" />
+      <solidref ref="PbRocket2.sub" />
+    </volume>
+
+    <volume name="CollimatorPbBlock.log">
+      <materialref ref="Pb" />
+      <solidref ref="PbBlock.box" />
+    </volume>
+
+    <volume name="Collimator.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="Collimator.box" />
+      <physvol name="CollimatorPbRocket">
+        <volumeref ref="CollimatorPbRocket.log" />
+        <position name="collimatorPbRocket.pos" unit="mm" x="0.0" y="0.0"
+          z="0.0" />
+        <rotation name="collimatorPbRocket.rot" unit="degree" y="90.0" />
+      </physvol>
+      <physvol
+        name="CollimatorPbBlock1">
+        <volumeref ref="CollimatorPbBlock.log" />
+        <position name="collimatorPbBlock1.pos" unit="mm" x="-PbTubeLength/2 - PbBlockSizeX/2"
+          y="0.0"
+          z="PbBlockSizeZ/2+SlitSize/2" />
+      </physvol>
+      <physvol name="CollimatorPbBlock2">
+        <volumeref ref="CollimatorPbBlock.log" />
+        <position name="collimatorPbBlock2.pos" unit="mm" x="-PbTubeLength/2 - PbBlockSizeX/2"
+          y="0.0"
+          z="-PbBlockSizeZ/2-SlitSize/2" />
+      </physvol>
+    </volume>
+
+    <volume name="World.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="World.box" />
+      <physvol
+        name="PassiveChamber_out">
+        <volumeref ref="PassiveChamber_out.log" />
+        <position name="PassiveChamber_out.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+      <physvol name="Collimator">
+        <volumeref ref="Collimator.log" />
+        <position name="Collimator.pos" unit="mm" x="SourceDistance_x+PbTubeLength/2" y="0.0"
+          z="265.0-liquidPhaseHeight/2-gasPhaseHeight/2" />
+        <!--<rotationref
+        ref="CollimatorRotation" />-->
+      </physvol>
+    </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="World.log" />
+  </setup>
+</gdml>

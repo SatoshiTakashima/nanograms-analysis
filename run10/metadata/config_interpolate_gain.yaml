@@ -3,7 +3,7 @@ input:
 
   # Example gamma run list. It should have a column named "time" by default.
   # "time" may be either "20251001/0233_05" or just "0233_05".
-  gamma_csv: ../metadata/data_group/data_group_zm4cm.csv
+  gamma_csv: ../metadata/data_group/data_group_z0cm.csv
   gamma_time_column: time
 
   # Required only when gamma_time_column values do not include the date.
@@ -11,4 +11,4 @@ input:
   fec_ids: [0, 1, 2, 3]
 
 output:
-  csv: products/interpolated_gain_zm4cm.csv
+  csv: products/interpolated_gain_z0cm.csv

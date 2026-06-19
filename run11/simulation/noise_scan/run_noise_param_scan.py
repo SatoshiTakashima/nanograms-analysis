@@ -3,24 +3,20 @@
 
 For each configured param1 value this script:
   1. copies detector_parameters.xml and edits <noise_level param1="...">,
-  2. writes a small Ruby simulation runner using that modified XML,
-  3. optionally executes the simulation and an optional postprocess command,
-  4. reads the produced simulation hittree,
-  5. compares the 1-hit energy histogram to the experimental hittree,
-  6. saves reduced chi-square results and best-fit plots.
+  2. optionally runs the configured Ruby simulation script with that XML,
+  3. reads the produced simulation hittree,
+  4. compares the 1-hit energy histogram to the experimental hittree,
+  5. saves reduced chi-square results and best-fit plots.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import math
-import shutil
 import subprocess
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import uproot
@@ -33,10 +29,10 @@ class ScanConfig:
     execute: bool
     num_events: int
     random_seed: int
+    energy_kev: float
     ruby_command: str
-    detector_configuration: Path
+    simulation_runner: Path
     detector_parameters_template: Path
-    gdml: Path
     param1_values: list[float]
     sim_output_name: str
     sim_hittree_name: str
@@ -76,22 +72,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def nested_get(config: dict[str, Any], path: str, default=None):
-    node: Any = config
-    for key in path.split("."):
-        if not isinstance(node, dict) or key not in node:
-            return default
-        node = node[key]
-    return node
-
-
-def required_value(config: dict[str, Any], path: str):
-    value = nested_get(config, path)
-    if value is None:
-        raise KeyError(f"Missing required config value: {path}")
-    return value
-
-
 def resolve_path(config_path: Path, value: str | Path) -> Path:
     path = Path(value).expanduser()
     if path.is_absolute():
@@ -102,49 +82,46 @@ def resolve_path(config_path: Path, value: str | Path) -> Path:
 def load_config(path: str | Path) -> ScanConfig:
     config_path = Path(path).expanduser().resolve()
     with config_path.open() as f:
-        config = yaml.safe_load(f) or {}
-
-    scan_node = nested_get(config, "scan", {}) or {}
-    if "values" in scan_node:
-        param1_values = [float(value) for value in scan_node["values"]]
-    else:
-        param1_values = np.linspace(
-            float(scan_node.get("min", 0.02)),
-            float(scan_node.get("max", 0.08)),
-            int(scan_node.get("steps", 7)),
-        ).tolist()
+        config = yaml.safe_load(f)
+    simulation = config["simulation"]
+    scan = config["scan"]
+    data = config["data"]
+    branches = config["branches"]
+    spectrum = config["spectrum"]
+    histogram_node = config["histogram"]
+    comparison = config["comparison"]
+    output = config["output"]
+    param1_values = (
+        [float(value) for value in scan["values"]]
+        if "values" in scan
+        else np.linspace(float(scan["min"]), float(scan["max"]), int(scan["steps"])).tolist()
+    )
 
     return ScanConfig(
-        outdir=resolve_path(config_path, nested_get(config, "output.outdir", "products/noise_scan")),
-        execute=bool(nested_get(config, "simulation.execute", False)),
-        num_events=int(nested_get(config, "simulation.num_events", 10000)),
-        random_seed=int(nested_get(config, "simulation.random_seed", 0)),
-        ruby_command=str(nested_get(config, "simulation.ruby_command", "ruby")),
-        detector_configuration=resolve_path(
-            config_path,
-            required_value(config, "simulation.detector_configuration"),
-        ),
-        detector_parameters_template=resolve_path(
-            config_path,
-            required_value(config, "simulation.detector_parameters_template"),
-        ),
-        gdml=resolve_path(config_path, required_value(config, "simulation.gdml")),
-        param1_values=param1_values,
-        sim_output_name=str(nested_get(config, "simulation.output_root", "simulation.root")),
-        sim_hittree_name=str(nested_get(config, "simulation.hittree_root", "simulation.root")),
-        postprocess_command=nested_get(config, "simulation.postprocess_command", None),
-        data_hittree=resolve_path(config_path, required_value(config, "data.hittree")),
-        tree_name=str(nested_get(config, "data.tree", "hittree")),
-        energy_branch=str(nested_get(config, "branches.energy", "energy")),
-        event_branch=str(nested_get(config, "branches.event", "eventid")),
-        histogram_min=float(nested_get(config, "histogram.min_kev", 0.0)),
-        histogram_max=float(nested_get(config, "histogram.max_kev", 2000.0)),
-        bin_width=float(nested_get(config, "histogram.bin_width_kev", 5.0)),
-        compare_min=float(nested_get(config, "comparison.min_kev", 350.0)),
-        compare_max=float(nested_get(config, "comparison.max_kev", 1300.0)),
-        normalize_min=float(nested_get(config, "comparison.normalize_min_kev", 350.0)),
-        spectrum_mode=str(nested_get(config, "spectrum.mode", "event-sum")),
-        one_hit_only=bool(nested_get(config, "spectrum.one_hit_only", True)),
+        outdir              = resolve_path(config_path, output["outdir"]),
+        execute             = bool(simulation["execute"]),
+        num_events          = int(simulation["num_events"]),
+        random_seed         = int(simulation["random_seed"]),
+        energy_kev          = float(simulation["energy_kev"]),
+        ruby_command        = str(simulation["ruby_command"]),
+        simulation_runner   = resolve_path(config_path, simulation["runner"]),
+        detector_parameters_template=resolve_path(config_path, simulation["detector_parameters_template"]),
+        param1_values       = param1_values,
+        sim_output_name     = str(simulation["output_root"]),
+        sim_hittree_name    = str(simulation["hittree_root"]),
+        postprocess_command = simulation["postprocess_command"],
+        data_hittree        = resolve_path(config_path, data["hittree"]),
+        tree_name           = str(data["tree"]),
+        energy_branch       = str(branches["energy"]),
+        event_branch        = str(branches["event"]),
+        histogram_min       = float(histogram_node["min_kev"]),
+        histogram_max       = float(histogram_node["max_kev"]),
+        bin_width           = float(histogram_node["bin_width_kev"]),
+        compare_min         = float(comparison["min_kev"]),
+        compare_max         = float(comparison["max_kev"]),
+        normalize_min       = float(comparison["normalize_min_kev"]),
+        spectrum_mode       = str(spectrum["mode"]),
+        one_hit_only        = bool(spectrum["one_hit_only"]),
     )
 
 
@@ -162,45 +139,6 @@ def write_detector_parameters(template: Path, output: Path, param1: float) -> No
         node.set("param1", f"{param1:.12g}")
     output.parent.mkdir(parents=True, exist_ok=True)
     tree.write(output, encoding="utf-8", xml_declaration=True)
-
-
-def write_ruby_runner(cfg: ScanConfig, run_dir: Path, detector_parameters: Path) -> Path:
-    script = run_dir / "run_simulation.rb"
-    sim_output = run_dir / cfg.sim_output_name
-    content = f"""#! /usr/bin/env ruby
-
-require 'comptonsoft'
-
-num = {cfg.num_events}
-random = {cfg.random_seed}
-energy = 1332.5
-
-sim = ComptonSoft::Simulation.new
-sim.output = {str(sim_output)!r}
-sim.random_seed = random
-sim.verbose = 0
-sim.set_database(detector_configuration: {str(cfg.detector_configuration)!r},
-                 detector_parameters: {str(detector_parameters)!r})
-sim.set_gdml {str(cfg.gdml)!r}
-
-sim.set_physics(hadron_hp: false, cut_value: 0.001, radioactive_decay: true)
-sim.enable_timing_process
-sim.set_primary_generator :PointSourcePrimaryGen, {{
-  particle: "gamma",
-  spectral_distribution: "gaussian",
-  energy_mean: energy,
-  energy_sigma: energy*0.001,
-  position: vec(159.4, 0.0, 37.5),
-  direction: vec(-1.0, 0.0, 0.0),
-  theta_min: 0.0,
-  theta_max: 90.0*Math::PI/180.0,
-}}
-
-sim.run(num)
-"""
-    script.write_text(content)
-    script.chmod(0o755)
-    return script
 
 
 def run_command(command: list[str], cwd: Path) -> None:
@@ -222,13 +160,23 @@ def prepare_or_run_simulation(cfg: ScanConfig, param1: float) -> Path:
 
     detector_parameters = run_dir / "detector_parameters.xml"
     write_detector_parameters(cfg.detector_parameters_template, detector_parameters, param1)
-    ruby_script = write_ruby_runner(cfg, run_dir, detector_parameters)
 
     sim_root = run_dir / cfg.sim_output_name
     sim_hittree = run_dir / cfg.sim_hittree_name
 
     if cfg.execute and not sim_root.exists():
-        run_command([cfg.ruby_command, str(ruby_script)], run_dir)
+        run_command(
+            [
+                cfg.ruby_command,
+                str(cfg.simulation_runner),
+                str(cfg.num_events),
+                f"{cfg.energy_kev:g}",
+                str(detector_parameters),
+                str(cfg.random_seed),
+                str(sim_root),
+            ],
+            cfg.simulation_runner.parent,
+        )
 
     if cfg.execute and cfg.postprocess_command:
         command = format_command(cfg.postprocess_command, run_dir, sim_root, sim_hittree)
@@ -362,18 +310,25 @@ def main() -> None:
     cfg = load_config(parse_args().config)
     cfg.outdir.mkdir(parents=True, exist_ok=True)
 
+    sim_hittrees = [
+        (param1, prepare_or_run_simulation(cfg, param1))
+        for param1 in cfg.param1_values
+    ]
+    sim_hittrees = [(param1, path) for param1, path in sim_hittrees if path.exists()]
+    scan_csv = cfg.outdir / "scan_results.csv"
+    if not sim_hittrees:
+        write_scan_csv([], scan_csv)
+        print(f"scan: {scan_csv}")
+        print("Prepared detector_parameters.xml files, but no completed simulation hittrees were compared.")
+        return
+
     data_energies = read_energies(cfg.data_hittree, cfg)
     data_counts, edges, centers = histogram(data_energies, cfg)
-
     results: list[ScanResult] = []
     best_sim_counts: np.ndarray | None = None
     best: ScanResult | None = None
 
-    for param1 in cfg.param1_values:
-        sim_hittree = prepare_or_run_simulation(cfg, param1)
-        if not sim_hittree.exists():
-            continue
-
+    for param1, sim_hittree in sim_hittrees:
         sim_energies = read_energies(sim_hittree, cfg)
         sim_counts, _, _ = histogram(sim_energies, cfg)
         alpha, chi2, ndf = compare_spectra(data_counts, sim_counts, centers, cfg)
@@ -391,7 +346,6 @@ def main() -> None:
             best = result
             best_sim_counts = sim_counts
 
-    scan_csv = cfg.outdir / "scan_results.csv"
     write_scan_csv(results, scan_csv)
     plot_scan(results, cfg.outdir / "chi2_scan.png")
 

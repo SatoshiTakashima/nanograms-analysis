@@ -34,10 +34,10 @@
         </parameters>
       </common>
       <detector_list id_method="path" layer_offset="1">
-        <detector id="0" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC0" />
-        <detector id="1" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC1" />
-        <detector id="2" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC2" />
-        <detector id="3" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC3" />
+        <detector id="0" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/PTFE.wall.vol/LAr.inner.vol/LArTPC0" />
+        <detector id="1" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/PTFE.wall.vol/LAr.inner.vol/LArTPC1" />
+        <detector id="2" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/PTFE.wall.vol/LAr.inner.vol/LArTPC2" />
+        <detector id="3" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/PTFE.wall.vol/LAr.inner.vol/LArTPC3" />
       </detector_list>
     </sensitive_detector>
   </data>

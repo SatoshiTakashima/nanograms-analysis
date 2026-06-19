@@ -11,15 +11,17 @@ peak ADUs.  These values can be passed to NanoGRAMSCalibration as gain_tp_hash.
 from __future__ import annotations
 
 import pandas as pd
-import yaml
 import sys
-sys.path.append("../../mymodule")
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2] / "mymodule"))
 from gain_interpolation import load_config, parse_gamma_datetime, interpolate_column
 
 
 if __name__ == "__main__":
+    config_path = sys.argv[1] if len(sys.argv) > 1 else "../metadata/config_interpolate_gain.yaml"
     testpulse_csv, gamma_csv, output_csv, gamma_time_column, default_date, fec_ids = load_config(
-        "../metadata/config_interpolate_gain.yaml"
+        config_path
     )
 
     tp = pd.read_csv(testpulse_csv)

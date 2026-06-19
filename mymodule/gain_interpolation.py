@@ -65,6 +65,13 @@ def parse_gamma_datetime(series: pd.Series, default_date: str | None) -> pd.Seri
 
 
 def interpolate_column(tp: pd.DataFrame, gamma_times: pd.Series, column: str) -> np.ndarray:
+    """Interpolate one FEC gain column at gamma-ray run times.
+
+    Each FEC is handled independently.  A gamma run before the first valid
+    test-pulse gain for that FEC is left blank instead of being filled from a
+    future measurement.  Values are written only when the gamma time is exactly
+    on a valid test-pulse point or bracketed by valid points on both sides.
+    """
     valid = tp[["datetime", column]].dropna().sort_values("datetime")
     if valid.empty:
         return np.full(len(gamma_times), np.nan)
@@ -73,7 +80,17 @@ def interpolate_column(tp: pd.DataFrame, gamma_times: pd.Series, column: str) ->
     y = valid[column].to_numpy(dtype=float)
     x_gamma = gamma_times.astype("int64").to_numpy(dtype=float) / 1.0e9
 
-    result = np.interp(x_gamma, x, y)
-    result[x_gamma < x[0]] = np.nan
-    result[x_gamma > x[-1]] = np.nan
+    result = np.full(len(x_gamma), np.nan, dtype=float)
+    index_after = np.searchsorted(x, x_gamma, side="left")
+
+    exact = np.zeros(len(x_gamma), dtype=bool)
+    has_after = index_after < len(x)
+    exact[has_after] = x[index_after[has_after]] == x_gamma[has_after]
+    result[exact] = y[index_after[exact]]
+
+    bracketed = (~exact) & (index_after > 0) & (index_after < len(x))
+    before = index_after[bracketed] - 1
+    after = index_after[bracketed]
+    weight_after = (x_gamma[bracketed] - x[before]) / (x[after] - x[before])
+    result[bracketed] = (1.0 - weight_after) * y[before] + weight_after * y[after]
     return result
