@@ -15,10 +15,7 @@
           <quenching factor="0.6" />
           <temperature value="87.0" />
           <efield bias="3000.0" mode="1" />
-          <charge_collection mode="2" >
-            <mutau electron="1.0e-1" hole="1.0e-5" />
-            <!-- tau=300us, v=muE=1.0mm/us, E=300V/cm -->
-          </charge_collection>
+          <charge_collection mode="0" />
           <diffusion mode="2">
             <constant anode="0.1" />
           </diffusion>

@@ -31,13 +31,9 @@ def run_simulation(num, energy, detector_parameter_file, random, output)
 end
 
 ### main ###
-random    = 0
-script_dir = File.expand_path(__dir__)
-num       = ARGV[0].to_i
-energy    = ARGV[1].to_f
-detector_parameter_file = ARGV[2] || File.join(script_dir, "../database/detector_parameters.xml")
-detector_parameter_file = File.expand_path(detector_parameter_file)
-random    = (ARGV[3] || random).to_i
-output    = ARGV[4] || "simulation_#{num}_#{energy.to_i}keV.root"
-p output
+random     = 0
+num    = ARGV[0].to_i
+energy = ARGV[1].to_f
+detector_parameter_file = ARGV[2]
+output = ARGV[3]
 run_simulation(num, energy, detector_parameter_file, random, output)
