@@ -6,23 +6,6 @@ input:
   # null means scan all date/time directories that contain file_name.
   date_dirs: [20251212]
   time_ids:
-    - 20251212/0300_24 
-    - 20251212/0300_53 
-    - 20251212/0301_22 
-    - 20251212/0308_52 
-    - 20251212/0309_21 
-    - 20251212/0309_49 
-    - 20251212/0310_18 
-    - 20251212/0318_12 
-    - 20251212/0318_41 
-    - 20251212/0319_39 
-    - 20251212/0327_58 
-    - 20251212/0328_27 
-    - 20251212/0328_56 
-    - 20251212/0329_25 
-    - 20251212/0336_39 
-    - 20251212/0337_08 
-    - 20251212/0337_37 
     - 20251212/0338_06 
     - 20251212/0345_21 
     - 20251212/0345_50 
@@ -111,7 +94,7 @@ quality:
   max_chi2_ndf: 5.0
 
 output:
-  outdir: products
+  outdir: ../products
   fits_csv: testpulse_fits.csv
   summary_csv: testpulse_data.csv
   plot_dir: plots

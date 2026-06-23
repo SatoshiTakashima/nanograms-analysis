@@ -496,6 +496,16 @@ class TestPulseReviewTkGUI:
         ctk.CTkButton(action_frame, text="Fit", command=self.on_fit, width=72, height=42, font=ctk.CTkFont(size=18)).grid(
             row=0, column=2, padx=(0, 7), pady=(20, 2), sticky="ew"
         )
+        ctk.CTkButton(
+            action_frame,
+            text="Reset",
+            command=self.on_reset_current_fits,
+            width=72,
+            height=42,
+            fg_color="#64748b",
+            hover_color="#475569",
+            font=ctk.CTkFont(size=18),
+        ).grid(row=1, column=2, padx=(0, 7), pady=(2, 20), sticky="ew")
         self.save_button = ctk.CTkButton(
             action_frame,
             text="Save summary",
@@ -918,6 +928,27 @@ class TestPulseReviewTkGUI:
             )
         self.current_state().message = "Fit done:\n" + "\n".join(detail_lines)
         self.update_status()
+
+    def on_reset_current_fits(self) -> None:
+        time_id = self.current_time_id()
+        reset_fecs = []
+        for fec in self.cfg.fec_ids:
+            state = self.state_for(time_id, fec)
+            if state.result is not None or state.use_fit is not None:
+                state.result = None
+                state.use_fit = None if state.peak_ok is True else False
+                self.initial_guesses.pop((time_id, fec), None)
+                reset_fecs.append(fec)
+        if reset_fecs:
+            self.current_state().message = (
+                f"Reset fit results for {time_id}: "
+                + ", ".join(f"FEC{fec}" for fec in reset_fecs)
+            )
+        else:
+            self.current_state().message = f"No fit results to reset for {time_id}."
+        self.set_guess_boxes_for_current_time(force=True)
+        self.persist()
+        self.draw()
 
     def on_save_summary(self) -> None:
         if self.save_button is not None:

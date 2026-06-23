@@ -30,7 +30,7 @@ end
 
 ### main ###
 data_root_dir = "/Users/takashima/work/grams/run/run11/tpc/data"
-gain_tp_file  = "../metadata/products/interpolated_gain_Na22.csv"
+gain_tp_file  = "../products/interpolated_gain_Na22.csv"
 outdir_parent = "products"
 
 data_group_list = ["Na22"]

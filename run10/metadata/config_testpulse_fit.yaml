@@ -54,7 +54,7 @@ quality:
   max_chi2_ndf: 5.0
 
 output:
-  outdir: products
+  outdir: ../products
   fits_csv: testpulse_fits.csv
   summary_csv: testpulse_data.csv
   plot_dir: plots

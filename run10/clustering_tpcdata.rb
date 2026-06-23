@@ -35,7 +35,7 @@ outdir_parent = "products"
 data_group_list = ["z0cm", "z4cm", "zm4cm"]
 
 data_group_list.each do |tag|
-  gain_tp_file  = "../metadata/products/interpolated_gain_#{tag}.csv"
+  gain_tp_file  = "../products/interpolated_gain_#{tag}.csv"
   filename      = "metadata/data_group/data_group_#{tag}.csv"
   hittree_files = []
   compton_files = []

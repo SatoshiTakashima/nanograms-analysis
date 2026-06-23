@@ -19,7 +19,7 @@ import os
 import sys
 sys.path.append("../../mymodule")
 import analyze_testpulse_gain as tp
-from fit_testpulse_data_gui import TestPulseReviewGUI
+from fit_testpulse_data_tk_gui import TestPulseReviewTkGUI
 
 if __name__ == "__main__":
     config_file_path = "../metadata/config_testpulse_fit.yaml"
@@ -31,5 +31,5 @@ if __name__ == "__main__":
     mpl_cache_dir.mkdir(parents=True, exist_ok=True)
     os.environ.setdefault("MPLCONFIGDIR", str(mpl_cache_dir))
 
-    app = TestPulseReviewGUI(cfg)
+    app = TestPulseReviewTkGUI(cfg)
     app.show()

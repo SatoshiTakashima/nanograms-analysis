@@ -16,6 +16,8 @@ input:
     - 20251001/0128_54
     - 20251001/0130_15
 
+    #- 20251001/0233_05
+    # - 20251001/0233_06
   quicklook_filename: quicklook_tree.root
   tree: tpcquicklook
 
