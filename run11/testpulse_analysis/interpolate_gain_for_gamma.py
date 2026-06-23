@@ -15,12 +15,17 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2] / "mymodule"))
-from gain_interpolation import load_config, parse_gamma_datetime, interpolate_column
+from gain_interpolation import (
+    load_config,
+    normalize_gamma_time_ids,
+    parse_gamma_datetime,
+    interpolate_column,
+)
 
 
 if __name__ == "__main__":
     config_path = sys.argv[1] if len(sys.argv) > 1 else "../metadata/config_interpolate_gain.yaml"
-    testpulse_csv, gamma_csv, output_csv, gamma_time_column, default_date, fec_ids = load_config(
+    testpulse_csv, gamma_csv, output_csv, gamma_time_column, fec_ids = load_config(
         config_path
     )
 
@@ -35,7 +40,8 @@ if __name__ == "__main__":
     if gamma_time_column not in gamma.columns:
         raise KeyError(f"Missing gamma time column: {gamma_time_column}")
 
-    gamma["datetime"] = parse_gamma_datetime(gamma[gamma_time_column], default_date)
+    gamma[gamma_time_column] = normalize_gamma_time_ids(gamma[gamma_time_column])
+    gamma["datetime"] = parse_gamma_datetime(gamma[gamma_time_column])
 
     for fec in fec_ids:
         column = f"FEC{fec}"

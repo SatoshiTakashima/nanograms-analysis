@@ -117,7 +117,7 @@ if __name__ == "__main__":
     num_workers = 10
     tree_name = "hittree"
 
-    num_photons = 1e9
+    num_photons = 5e8
 
     simConfigDict = {
         "Na22": {"511.0": 2*num_photons,  

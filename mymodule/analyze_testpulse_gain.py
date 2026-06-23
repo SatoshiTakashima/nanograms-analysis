@@ -168,9 +168,33 @@ def parse_time_id(time_id: str) -> datetime:
     return datetime.strptime(time_id, "%Y%m%d/%H%M_%S")
 
 
+def expand_config_time_id(time_id: str, cfg: FitConfig) -> list[str]:
+    if "/" in time_id:
+        return [time_id]
+
+    date_dirs = cfg.date_dirs
+    if date_dirs is None:
+        date_dirs = sorted(path.name for path in cfg.data_root.iterdir() if path.is_dir())
+
+    candidates = [f"{date_dir}/{time_id}" for date_dir in date_dirs]
+    existing = [
+        candidate
+        for candidate in candidates
+        if (cfg.data_root / candidate / cfg.file_name).exists()
+    ]
+    if existing:
+        return existing
+    if len(candidates) == 1:
+        return candidates
+    return candidates
+
+
 def discover_time_ids(cfg: FitConfig) -> list[str]:
     if cfg.time_ids is not None:
-        return sorted(cfg.time_ids, key=parse_time_id)
+        time_ids: list[str] = []
+        for time_id in cfg.time_ids:
+            time_ids.extend(expand_config_time_id(time_id, cfg))
+        return sorted(time_ids, key=parse_time_id)
 
     date_dirs = cfg.date_dirs
     if date_dirs is None:

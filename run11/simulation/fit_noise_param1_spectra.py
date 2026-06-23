@@ -87,7 +87,8 @@ if __name__ == "__main__":
     run11_dir = simulation_dir.parent
 
     scan_root  = simulation_dir / "products/noise_param1_scan"
-    data_root  = run11_dir / "products/hittree_merge_Na22.root"
+    #data_root  = run11_dir / "products/hittree_merge_Na22.root"
+    data_root  = run11_dir / "products/noise_param1_scan/param1_2p300/hittree_merge_Na22.root"
     output_csv = scan_root / "fit_results.csv"
     output_png = scan_root / "best_fit.png"
 

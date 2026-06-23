@@ -37,13 +37,11 @@ if __name__ == "__main__":
     run11_dir = simulation_dir.parent
 
     template_xml = run11_dir / "database/detector_parameters/detector_parameters.xml"
-    output_root = simulation_dir / "products/noise_param1_scan"
+    output_root  = simulation_dir / "products/noise_param1_scan"
 
-    #param1_start = 0.020
-    #param1_stop  = 0.080
-    param1_start = 0.022
-    param1_stop  = 0.080
-    param1_step  = 0.002
+    param1_start = 1.5
+    param1_stop  = 4.5
+    param1_step  = 0.2
     epsilon      = 1e-5
 
     param1_values = np.arange(param1_start, param1_stop + epsilon, param1_step)

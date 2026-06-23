@@ -41,7 +41,7 @@ def resolve_path(config_path: Path, value: str | Path) -> Path:
     return (config_path.parent / path).resolve()
 
 
-def load_config(path: str | Path) -> tuple[Path, Path, Path, str, str | None, list[int]]:
+def load_config(path: str | Path) -> tuple[Path, Path, Path, str, list[int]]:
     config_path = Path(path).expanduser().resolve()
     with config_path.open() as f:
         config = yaml.safe_load(f) or {}
@@ -50,18 +50,24 @@ def load_config(path: str | Path) -> tuple[Path, Path, Path, str, str | None, li
     gamma_csv = resolve_path(config_path, required_value(config, "input.gamma_csv"))
     output_csv = resolve_path(config_path, nested_get(config, "output.csv", "gamma_runs_with_gain.csv"))
     gamma_time_column = str(nested_get(config, "input.gamma_time_column", "time"))
-    default_date = nested_get(config, "input.default_date", None)
     fec_ids = [int(fec) for fec in nested_get(config, "input.fec_ids", [0, 1, 2, 3])]
-    return testpulse_csv, gamma_csv, output_csv, gamma_time_column, default_date, fec_ids
+    return testpulse_csv, gamma_csv, output_csv, gamma_time_column, fec_ids
 
 
-def parse_gamma_datetime(series: pd.Series, default_date: str | None) -> pd.Series:
+def normalize_gamma_time_ids(series: pd.Series) -> pd.Series:
     values = series.astype(str)
-    if values.str.contains("/").any():
-        return pd.to_datetime(values, format="%Y%m%d/%H%M_%S")
-    if default_date is None:
-        raise ValueError("gamma times have no date; set input.default_date in YAML.")
-    return pd.to_datetime(default_date + "/" + values, format="%Y%m%d/%H%M_%S")
+    missing_date = ~values.str.contains("/")
+    if missing_date.any():
+        examples = ", ".join(values[missing_date].head(3))
+        raise ValueError(
+            "Gamma time values must be YYYYMMDD/HHMM_SS. "
+            f"Missing date in: {examples}"
+        )
+    return values
+
+
+def parse_gamma_datetime(series: pd.Series) -> pd.Series:
+    return pd.to_datetime(normalize_gamma_time_ids(series), format="%Y%m%d/%H%M_%S")
 
 
 def interpolate_column(tp: pd.DataFrame, gamma_times: pd.Series, column: str) -> np.ndarray:
