@@ -1,0 +1,65 @@
+input:
+  data_root: /Users/grams/run/run12/vata
+  file_name: outfile00001_000.root
+  tree: vatatree
+
+  time_ids:
+    - "20260625_1715_49"
+    - "20260625_1716_23"
+    - "20260625_1716_58"
+    - "20260625_1717_32"
+    - "20260625_1720_24"
+    - "20260625_1720_58"
+    - "20260625_1721_22"
+    - "20260625_1721_39"
+    - "20260625_1725_05"
+    - "20260625_1732_42"
+    - "20260625_1740_32"
+    - "20260625_1741_07"
+    - "20260625_1746_16"
+    - "20260625_1749_40"
+    - "20260625_1750_49"
+    - "20260625_1809_18"
+    - "20260625_1809_53"
+    - "20260625_1810_27"
+    - "20260625_1811_02"
+    - "20260625_1810_27"
+    - "20260625_1813_52"
+    - "20260625_1814_27"
+    - "20260625_1815_01"
+    - "20260625_1815_36"
+    - "20260625_1825_21"
+    - "20260625_1825_56"
+
+test_pulse:
+  channel: 17
+  ccal: 8
+  fec_ids: [0, 1, 2, 3]
+
+fit:
+  histogram_min_adu: -50.0
+  histogram_max_adu: 1000.0
+  histogram_bin_width_adu: 1.0
+  fit_window_adu: 6.0
+
+quality:
+  min_events: 100
+  min_fit_entries: 50
+  min_peak_count: 20
+  peak_min_adu: 20.0
+  peak_max_adu: 1000.0
+  sigma_min_adu: 0.5
+  sigma_max_adu: 50.0
+  max_chi2_ndf: 5.0
+
+output:
+  outdir: ../products
+  fits_csv: testpulse_fits.csv
+  summary_csv: testpulse_data.csv
+  plot_dir: plots
+  make_plots: true
+
+review:
+  use_manual_selection: true
+  selection_csv: manual_selection.csv
+  plot_dir: review_plots

@@ -1,0 +1,62 @@
+input:
+  #quicklook_file: /path/to/tpc_data_quicklook.root
+  #quicklook_file: /Users/takashima/work/grams/nanograms-analysis/run10/products/20251001/0233_05/quicklook_tree.root
+  quicklook_root_dir: /Users/grams/run/run12/analysis/nanograms-analysis/run12_test2/products
+  quicklook_dirs:
+    - 20251001/0128_54
+
+    #- 20251001/0233_05
+    # - 20251001/0233_06
+  quicklook_filename: quicklook_tree500000.root
+  tree: tpcquicklook
+
+selection:
+  # null means all entries.  You can also write [0, 1, 2].
+  entries: null
+  max_events: 2000
+  # event_type: 0=other, 1=gamma, 2=cosmic
+  event_types: null
+
+charge:
+  colorbar_vmin: 0.0
+  # null means event-by-event maximum. Set e.g. 200.0 to fix the colorbar.
+  colorbar_vmax: 50 #null
+  # max uses the largest ADC-CMN value across all FEC0-3 pixels.
+  # Use percentile only when you intentionally want to clip isolated hot pixels.
+  scale: max
+  percentile_vmax: 99.0
+  # Draw hit pixels stored by ComptonSoft in hit_pixel_fec/hit_pixel_ch.
+  draw_hit_markers: true
+  cmap: viridis
+  draw_pixel_grid: true
+  draw_channel_numbers: false
+
+drift:
+  # quicklook drift_time is stored in TPC clock counts.
+  count_to_us: 0.01
+  offset_us: 0.68
+  max_drift_time_us: 150.0
+
+light:
+  channels: [0]
+  adc_to_mv: 0.1220703125
+  # pow2_ns means dt = 2**wave_compress ns.
+  # value_ns means dt = wave_compress ns.
+  # fixed_32ns means dt = 32 ns.
+  dt_mode: value_ns
+  # trigger uses the ComptonSoft convention: t=0 at delay_counts*8 samples.
+  # peak keeps the old behavior: t=0 at the largest light pulse in each event.
+  time_reference: trigger
+  delay_counts: 60
+  # Change this range to inspect pileup-like peaks outside the prompt window.
+  time_range_us: [-20.0, 240.0]
+  baseline_samples: 100
+
+output:
+  outdir: quicklook_plots
+  # Leave null to infer labels such as 0233_05 from the quicklook file path.
+  source_label: null
+  dpi: 140
+  # Non-gamma/cosmic plots are saved as lower-quality JPEGs to reduce file size.
+  low_quality_dpi: 70
+  low_quality_jpeg_quality: 50

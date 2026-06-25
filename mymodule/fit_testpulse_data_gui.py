@@ -77,7 +77,7 @@ def result_from_row(row: dict[str, str], cfg: tp.FitConfig) -> tp.FitResult | No
         return None
     time_id = row["time_id"]
     file_path_text = row.get("file_path", "").strip()
-    file_path = Path(file_path_text) if file_path_text else cfg.data_root / time_id / cfg.file_name
+    file_path = Path(file_path_text) if file_path_text else tp.input_file_path(cfg, time_id)
     return tp.FitResult(
         time_id=time_id,
         file_path=file_path,
@@ -120,7 +120,7 @@ def review_row(cfg: tp.FitConfig,
                fec: int,
                state: ReviewState) -> list[object]:
     result = state.result
-    file_path = result.file_path if result is not None else cfg.data_root / time_id / cfg.file_name
+    file_path = result.file_path if result is not None else tp.input_file_path(cfg, time_id)
     return [
         time_id,
         tp.parse_time_id(time_id).isoformat(sep=" "),
@@ -175,7 +175,7 @@ def write_summary_from_review(cfg: tp.FitConfig,
         if state.result is not None:
             results.append(state.result)
         else:
-            results.append(tp.FitResult(time_id, cfg.data_root / time_id / cfg.file_name, fec))
+            results.append(tp.FitResult(time_id, tp.input_file_path(cfg, time_id), fec))
     tp.write_summary_csv(results, cfg, manual_selection)
 
 
@@ -606,7 +606,7 @@ class TestPulseReviewTkGUI:
         return self.current_time_id(), self.selected_fec
 
     def current_file_path(self) -> Path:
-        return self.cfg.data_root / self.current_time_id() / self.cfg.file_name
+        return tp.input_file_path(self.cfg, self.current_time_id())
 
     def state_for(self, time_id: str, fec: int) -> ReviewState:
         key = (time_id, fec)
@@ -631,7 +631,7 @@ class TestPulseReviewTkGUI:
     def values_for(self, time_id: str, fec: int) -> np.ndarray:
         key = (time_id, fec)
         if key not in self.values_cache:
-            file_path = self.cfg.data_root / time_id / self.cfg.file_name
+            file_path = tp.input_file_path(self.cfg, time_id)
             for loaded_fec, values in tp.read_fec_channel_values_by_fec(file_path, self.cfg).items():
                 self.values_cache[(time_id, loaded_fec)] = values
         self.note_cached_time(time_id)
@@ -645,7 +645,7 @@ class TestPulseReviewTkGUI:
         return self.cfg.outdir / "gui_hist_cache" / f"{safe_time}_fec{fec}_ch{self.cfg.test_pulse_channel}.npz"
 
     def histogram_cache_metadata(self, time_id: str, fec: int) -> dict[str, float | int]:
-        file_path = self.cfg.data_root / time_id / self.cfg.file_name
+        file_path = tp.input_file_path(self.cfg, time_id)
         try:
             source_mtime_ns = file_path.stat().st_mtime_ns
         except FileNotFoundError:

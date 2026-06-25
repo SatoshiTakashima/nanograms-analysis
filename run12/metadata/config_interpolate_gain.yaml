@@ -1,0 +1,8 @@
+input:
+  testpulse_csv: ../products/testpulse_data.csv
+  gamma_csv: ../metadata/data_group/data_group_test.csv
+
+  fec_ids: [0, 1, 2, 3]
+
+output:
+  csv: ../products/interpolated_gain_test.csv

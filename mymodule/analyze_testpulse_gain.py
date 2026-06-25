@@ -165,11 +165,33 @@ def load_config(path: str | Path) -> FitConfig:
 
 
 def parse_time_id(time_id: str) -> datetime:
-    return datetime.strptime(time_id, "%Y%m%d/%H%M_%S")
+    for candidate, fmt in (
+        (time_id, "%Y%m%d/%H%M_%S"),
+        (time_id, "%Y%m%d_%H%M_%S"),
+        (time_id.rsplit("/", 1)[-1], "%Y%m%d_%H%M_%S"),
+    ):
+        try:
+            return datetime.strptime(candidate, fmt)
+        except ValueError:
+            continue
+    raise ValueError(
+        f"time ID {time_id!r} does not match YYYYMMDD/HHMM_SS or YYYYMMDD_HHMM_SS"
+    )
+
+
+def input_file_path(cfg: FitConfig, time_id: str) -> Path:
+    return cfg.data_root / time_id / cfg.file_name
+
+
+def unique_time_ids(time_ids: list[str]) -> list[str]:
+    return list(dict.fromkeys(time_ids))
 
 
 def expand_config_time_id(time_id: str, cfg: FitConfig) -> list[str]:
     if "/" in time_id:
+        return [time_id]
+
+    if input_file_path(cfg, time_id).exists():
         return [time_id]
 
     date_dirs = cfg.date_dirs
@@ -194,7 +216,7 @@ def discover_time_ids(cfg: FitConfig) -> list[str]:
         time_ids: list[str] = []
         for time_id in cfg.time_ids:
             time_ids.extend(expand_config_time_id(time_id, cfg))
-        return sorted(time_ids, key=parse_time_id)
+        return sorted(unique_time_ids(time_ids), key=parse_time_id)
 
     date_dirs = cfg.date_dirs
     if date_dirs is None:
@@ -205,10 +227,13 @@ def discover_time_ids(cfg: FitConfig) -> list[str]:
         date_path = cfg.data_root / date_dir
         if not date_path.is_dir():
             continue
+        if (date_path / cfg.file_name).exists():
+            time_ids.append(date_dir)
+            continue
         for time_path in sorted(path for path in date_path.iterdir() if path.is_dir()):
             if (time_path / cfg.file_name).exists():
                 time_ids.append(f"{date_dir}/{time_path.name}")
-    return sorted(time_ids, key=parse_time_id)
+    return sorted(unique_time_ids(time_ids), key=parse_time_id)
 
 
 def gaussian_with_const(x, amplitude, mean, sigma, baseline):
@@ -729,7 +754,7 @@ def main() -> None:
 
     results: list[FitResult] = []
     for time_id in discover_time_ids(cfg):
-        file_path = cfg.data_root / time_id / cfg.file_name
+        file_path = input_file_path(cfg, time_id)
         if not file_path.exists():
             print(f"[skip] missing: {file_path}")
             continue
