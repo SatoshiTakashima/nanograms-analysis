@@ -11,7 +11,6 @@ peak ADUs.  These values can be passed to NanoGRAMSCalibration as gain_tp_hash.
 from __future__ import annotations
 
 import argparse
-import re
 from pathlib import Path
 from typing import Any
 
@@ -54,37 +53,16 @@ def load_config(path: str | Path) -> tuple[Path, Path, Path, str, list[int]]:
     return testpulse_csv, gamma_csv, output_csv, fec_ids
 
 
-TIME_ID_SLASH_RE = re.compile(r"^\d{8}/\d{4}_\d{2}$")
-TIME_ID_FLAT_RE = re.compile(r"^(\d{8})_(\d{4}_\d{2})$")
-
-
-def normalize_time_id(value: str) -> str:
-    text = str(value).strip()
-    if TIME_ID_SLASH_RE.fullmatch(text):
-        return text
-    match = TIME_ID_FLAT_RE.fullmatch(text)
-    if match:
-        return f"{match.group(1)}/{match.group(2)}"
-    raise ValueError(f"Invalid time value: {text}")
-
-
 def normalize_gamma_time_ids(series: pd.Series) -> pd.Series:
     values = series.astype(str)
-    try:
-        return values.map(normalize_time_id)
-    except ValueError:
-        invalid = []
-        for value in values:
-            try:
-                normalize_time_id(value)
-            except ValueError:
-                invalid.append(str(value))
-            if len(invalid) >= 3:
-                break
+    missing_date = ~values.str.contains("/")
+    if missing_date.any():
+        examples = ", ".join(values[missing_date].head(3))
         raise ValueError(
-            "Gamma time values must be YYYYMMDD/HHMM_SS or YYYYMMDD_HHMM_SS. "
-            f"Invalid value(s): {', '.join(invalid)}"
-        ) from None
+            "Gamma time values must be YYYYMMDD/HHMM_SS. "
+            f"Missing date in: {examples}"
+        )
+    return values
 
 
 def parse_gamma_datetime(series: pd.Series) -> pd.Series:
