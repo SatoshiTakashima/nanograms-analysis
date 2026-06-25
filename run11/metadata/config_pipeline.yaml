@@ -8,7 +8,6 @@ light:
     pileup_analysis_channels: [4]
     light_gamma_thr_mV: 20.0
     light_cosmic_thr_mV: 250.0
-    delay_counts: 60
     pre_roi_window_us: 1.0
     post_roi_window_us: 5.0
     out_roi_peak_thr_mV: 15.0

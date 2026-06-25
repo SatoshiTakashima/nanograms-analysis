@@ -4,6 +4,8 @@ require 'comptonsoft'
 require 'fileutils'
 require 'csv'
 
+Dir.chdir(File.expand_path(__dir__))
+
 class MyApp < ANL::ANLApp
   attr_accessor :inputs, :output
   attr_accessor :source_position
@@ -31,29 +33,28 @@ end
 
 ### main ###
 source_position = vec(50.0, 0.0, 0.0)
-outdir_parent = "products"
+outdir_parent = "products/eventfile"
+
+def event_dir_name(time_id)
+  time_id.strip.tr("/", "_")
+end
 
 data_group_list = ["test"]
 
 data_group_list.each do |tag|
-  filename      = "metadata/data_group/data_group_#{tag}.csv"
-  outdir        = "#{outdir_parent}/#{tag}"
-  hittree_files = []
-  
-  FileUtils.mkdir_p(outdir)
-  
+  filename = "metadata/data_group/data_group_#{tag}.csv"
+
   CSV.foreach(filename, headers: true) do |row|
-    time_array = row["time"].split("/")
-    hittree_path = "#{outdir_parent}/#{time_array[0]}/#{time_array[1]}/hittree.root"
-    hittree_files << hittree_path
+    outdir = File.join(outdir_parent, event_dir_name(row["time"]))
+    FileUtils.mkdir_p(outdir)
+
+    ### Event reconstruction
+    a = MyApp.new
+    a.console = false
+    a.source_position = source_position
+    a.inputs = ["#{outdir}/hittree.root"]
+    a.output = "#{outdir}/compton.root"
+
+    a.run(:all)
   end
-  
-  ### Event reconstruction
-  a = MyApp.new
-  a.console = false
-  a.source_position = source_position
-  a.inputs = hittree_files
-  a.output = "#{outdir}/compton.root"
-  
-  a.run(:all)
 end

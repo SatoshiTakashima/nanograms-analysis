@@ -4,8 +4,6 @@ input:
   # Example gamma run list. It should have a column named "time" by default.
   # "time" must be YYYYMMDD/HHMM_SS.
   gamma_csv: ../metadata/data_group/data_group_Na22.csv
-  gamma_time_column: time
-
   fec_ids: [0, 1, 2, 3]
 
 output:

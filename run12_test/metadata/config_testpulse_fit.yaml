@@ -3,22 +3,20 @@ input:
   file_name: outfile00001_000.root
   tree: vatatree
 
-  # null means scan all date/time directories that contain file_name.
-  date_dirs: [20251001]
   time_ids:
-    - "0124_04"
-    - "0132_24"
-    - "0133_40"
-    - "0138_47"
-    - "0154_02"
-    - "0155_42"
-    - "0156_57"
-    - "0207_53"
-    - "0213_23"
-    - "0217_09"
-    - "0234_38"
-    - "0245_47"
-    - "0247_07"
+    - "20251001/0124_04"
+    - "20251001/0132_24"
+    - "20251001/0133_40"
+    - "20251001/0138_47"
+    - "20251001/0154_02"
+    - "20251001/0155_42"
+    - "20251001/0156_57"
+    - "20251001/0207_53"
+    - "20251001/0213_23"
+    - "20251001/0217_09"
+    - "20251001/0234_38"
+    - "20251001/0245_47"
+    - "20251001/0247_07"
 
 test_pulse:
   channel: 17
@@ -49,10 +47,6 @@ output:
   make_plots: true
 
 review:
-  # The GUI also uses this file for click-by-click review state.
-  # For batch review, true means the first run creates manual_selection.csv
-  # and review images. Fill use_fit with 1/0, then rerun to create the final
-  # summary CSV.
   use_manual_selection: true
   selection_csv: manual_selection.csv
   plot_dir: review_plots

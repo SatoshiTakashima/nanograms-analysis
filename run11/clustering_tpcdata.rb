@@ -8,6 +8,7 @@ class MyAppDataReduction < ANL::ANLApp
   attr_accessor :tpc_tree_file, :hittree_file
   attr_accessor :quicklook_file
   attr_accessor :gain_tp_file, :gain_tp_hash
+  attr_accessor :gain_cache_seconds
 
   def setup
     add_namespace ComptonSoft
@@ -23,6 +24,7 @@ class MyAppDataReduction < ANL::ANLApp
     calibration_parameters = { hittree_file: @hittree_file }
     calibration_parameters[:gain_tp_hash] = @gain_tp_hash if @gain_tp_hash
     calibration_parameters[:gain_tp_file] = @gain_tp_file if @gain_tp_file
+    calibration_parameters[:gain_cache_seconds] = @gain_cache_seconds if @gain_cache_seconds
     with_parameters(**calibration_parameters)
   end
 end
@@ -30,8 +32,9 @@ end
 
 ### main ###
 data_root_dir = "/Users/takashima/work/grams/run/run11/tpc/data"
-gain_tp_file  = "../products/interpolated_gain_Na22.csv"
+gain_tp_file  = "../products/testpulse_data.csv"
 outdir_parent = "products"
+gain_cache_seconds = 60.0
 
 data_group_list = ["Na22"]
 
@@ -52,6 +55,7 @@ data_group_list.each do |tag|
    a.tpc_tree_file  = "#{data_dir}/tpc_data.root"
    a.quicklook_file = "#{outdir}/quicklook_tree.root"
    a.gain_tp_file   = gain_tp_file
+   a.gain_cache_seconds = gain_cache_seconds
    a.hittree_file   = "#{outdir}/hittree.root"
   
    a.run(:all)

@@ -58,7 +58,7 @@ calibration:
 | Key | Type/range | Meaning |
 | --- | --- | --- |
 | `event_selection_mode` | `gamma_required`, `veto_only`, or `disabled` | Controls how light waveforms enter event selection. |
-| `waveform_analysis` | `average` or `channel` | `average` uses the average waveform from `light_channels`; `channel` checks each channel independently. |
+| `waveform_analysis` | `average` or `each_channel` | `average` uses the average waveform from the configured channels; `each_channel` checks each channel independently and merges the peak decisions. |
 | `light_channels` | list of DPP channel IDs, normally 0-7 | Channels used for light waveform analysis. |
 | `light_gamma_thr_mV` | number, mV | ROI peak threshold for gamma selection when `event_selection_mode` is `gamma_required`. |
 | `light_cosmic_thr_mV` | number, mV | ROI peak threshold above which the event is classified as cosmic. |
@@ -74,6 +74,20 @@ calibration:
 | `gamma_required` | Light waveform must pass the gamma threshold, and charge clustering must also pass. |
 | `veto_only` | Charge clustering defines gamma candidates; light is used only to veto cosmic and pileup events. This is closest to the old `run_nhit.py` workflow. |
 | `disabled` | Light waveform is not used in event selection. |
+
+Only these exact strings are accepted. Aliases such as `require_gamma`, `veto`,
+`none`, or `off` are intentionally rejected so that one string maps to one
+behavior.
+
+### `waveform_analysis`
+
+| Word | Behavior |
+| --- | --- |
+| `average` | Align the configured channels on a common time axis, average the waveforms, and find peaks in that averaged waveform. Channels in one analysis group must have the same `wave_compress`. |
+| `each_channel` | Analyze each configured channel separately and merge the peak decisions. This keeps channel-by-channel differences visible and does not require averaging-compatible waveforms. |
+
+Only these exact strings are accepted. Aliases such as `mean`, `channel`, or
+`per_channel` are intentionally rejected.
 
 The legacy boolean `use_for_event_selection` is still accepted. `true` maps to
 `gamma_required`, and `false` maps to `disabled`. New configs should prefer
@@ -100,7 +114,6 @@ The keys are FEC IDs `0`, `1`, `2`, and `3`. Each value can be one of:
 | --- | --- |
 | `[0, 63]` | Exclude only the listed channels from core-seed candidates. |
 | `peripheral` | Exclude all peripheral pixels in that FEC section from core-seed candidates. |
-| `periphery` | Alias of `peripheral`. |
 | `[peripheral, 12, 34]` | Exclude all peripheral pixels plus explicit channels. |
 
 The old key name `exclude_pix` is still accepted as a fallback, but

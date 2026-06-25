@@ -25,7 +25,7 @@ from gain_interpolation import (
 
 if __name__ == "__main__":
     config_path = sys.argv[1] if len(sys.argv) > 1 else "../metadata/config_interpolate_gain.yaml"
-    testpulse_csv, gamma_csv, output_csv, gamma_time_column, fec_ids = load_config(
+    testpulse_csv, gamma_csv, output_csv, fec_ids = load_config(
         config_path
     )
 
@@ -37,11 +37,11 @@ if __name__ == "__main__":
     tp = tp.sort_values("datetime").reset_index(drop=True)
 
     gamma = pd.read_csv(gamma_csv)
-    if gamma_time_column not in gamma.columns:
-        raise KeyError(f"Missing gamma time column: {gamma_time_column}")
+    if "time" not in gamma.columns:
+        raise KeyError("Missing gamma time column: time")
 
-    gamma[gamma_time_column] = normalize_gamma_time_ids(gamma[gamma_time_column])
-    gamma["datetime"] = parse_gamma_datetime(gamma[gamma_time_column])
+    gamma["time"] = normalize_gamma_time_ids(gamma["time"])
+    gamma["datetime"] = parse_gamma_datetime(gamma["time"])
 
     for fec in fec_ids:
         column = f"FEC{fec}"
